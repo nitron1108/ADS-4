@@ -5,8 +5,6 @@ int countPairs1(int *arr, int len, int value) {
         for (int j = i + 1; j < len; ++j) {
             if (arr[i] + arr[j] == value) {
                 count++;
-            } else if (arr[i] + arr[j] > value) {
-                break;
             }
         }
     }
@@ -24,13 +22,13 @@ int countPairs2(int *arr, int len, int value) {
                 count += (right - left + 1) * (right - left) / 2;
                 break;
             }
-            int temp_left = left;
-            int temp_right = right;
-            while (arr[temp_left] == arr[left]) temp_left++;
-            while (arr[temp_right] == arr[right]) temp_right--;
-            count += (temp_left - left) * (right - temp_right);
-            left = temp_left;
-            right = temp_right;
+            int l = left;
+            int r = right;
+            while (arr[l] == arr[left]) l++;
+            while (arr[r] == arr[right]) r--;
+            count += (l - left) * (right - r);
+            left = l;
+            right = r;
         } else if (sum < value) {
             left++;
         } else {
@@ -46,20 +44,12 @@ int countPairs3(int *arr, int len, int value) {
         int target = value - arr[i];
         int left = i + 1;
         int right = len - 1;
+        bool found = false;
         while (left <= right) {
             int mid = left + (right - left) / 2;
             if (arr[mid] == target) {
                 count++;
-                int l = mid - 1;
-                while (l >= left && arr[l] == target) {
-                    count++;
-                    l--;
-                }
-                int r = mid + 1;
-                while (r <= right && arr[r] == target) {
-                    count++;
-                    r++;
-                }
+                found = true;
                 break;
             } else if (arr[mid] < target) {
                 left = mid + 1;
@@ -67,6 +57,13 @@ int countPairs3(int *arr, int len, int value) {
                 right = mid - 1;
             }
         }
+        if (found) {
+            int j = left;
+            while (j <= right && arr[j] == target) {
+                if (j != i) count++;
+                j++;
+            }
+        }
     }
-    return count;
+    return count / 2;
 }
