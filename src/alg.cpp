@@ -27,12 +27,14 @@ int countPairs2(int *arr, int len, int value) {
       }
 
       int left_count = 1;
-      while (left + left_count < right && arr[left] == arr[left + left_count]) {
+      while (left + left_count < right &&
+             arr[left] == arr[left + left_count]) {
         left_count++;
       }
 
       int right_count = 1;
-      while (right - right_count > left && arr[right] == arr[right - right_count]) {
+      while (right - right_count > left &&
+             arr[right] == arr[right - right_count]) {
         right_count++;
       }
 
@@ -54,40 +56,39 @@ int countPairs3(int *arr, int len, int value) {
     int target = value - arr[i];
     int left = i + 1;
     int right = len - 1;
-
-    // бинарный поиск всех вхождений target, считаем количество повторов
-    int first_occurrence = -1;
-    int last_occurrence = -1;
+    int pos = -1;
 
     while (left <= right) {
       int mid = left + (right - left) / 2;
       if (arr[mid] == target) {
-        first_occurrence = mid;
-        right = mid - 1;
+        pos = mid;
+        break;
       } else if (arr[mid] < target) {
         left = mid + 1;
       } else {
         right = mid - 1;
       }
     }
-    if (first_occurrence == -1) continue;
 
-    // найти последнее вхождение target
-    left = first_occurrence;
-    right = len - 1;
-    while (left <= right) {
-      int mid = left + (right - left) / 2;
-      if (arr[mid] == target) {
-        last_occurrence = mid;
-        left = mid + 1;
-      } else if (arr[mid] < target) {
-        left = mid + 1;
-      } else {
-        right = mid - 1;
-      }
+    if (pos == -1)
+      continue;
+
+  
+    int count_left = 1;
+    int j = pos - 1;
+    while (j > i && arr[j] == target) {
+      count_left++;
+      j--;
     }
-    int count_targets = last_occurrence - first_occurrence + 1;
-    count += count_targets;
+    
+    int count_right = 1;
+    j = pos + 1;
+    while (j < len && arr[j] == target) {
+      count_right++;
+      j++;
+    }
+
+    count += count_left + count_right - 1; // -1 потому что pos считается дважды
   }
   return count;
 }
