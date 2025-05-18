@@ -3,9 +3,7 @@
 int countPairs1(int *arr, int len, int value) {
   int count = 0;
   for (int i = 0; i < len; ++i) {
-    if (i > 0 && arr[i] == arr[i - 1]) continue;
     for (int j = i + 1; j < len; ++j) {
-      if (j > i + 1 && arr[j] == arr[j - 1]) continue;
       if (arr[i] + arr[j] == value) {
         count++;
       }
@@ -29,14 +27,12 @@ int countPairs2(int *arr, int len, int value) {
       }
 
       int left_count = 1;
-      while (left + left_count < right &&
-             arr[left] == arr[left + left_count]) {
+      while (left + left_count < right && arr[left] == arr[left + left_count]) {
         left_count++;
       }
 
       int right_count = 1;
-      while (right - right_count > left &&
-             arr[right] == arr[right - right_count]) {
+      while (right - right_count > left && arr[right] == arr[right - right_count]) {
         right_count++;
       }
 
@@ -55,29 +51,43 @@ int countPairs2(int *arr, int len, int value) {
 int countPairs3(int *arr, int len, int value) {
   int count = 0;
   for (int i = 0; i < len; ++i) {
-    if (i > 0 && arr[i] == arr[i - 1]) continue;
     int target = value - arr[i];
     int left = i + 1;
     int right = len - 1;
 
-    bool found = false;
+    // бинарный поиск всех вхождений target, считаем количество повторов
+    int first_occurrence = -1;
+    int last_occurrence = -1;
+
     while (left <= right) {
       int mid = left + (right - left) / 2;
       if (arr[mid] == target) {
-        found = true;
-        break;
+        first_occurrence = mid;
+        right = mid - 1;
       } else if (arr[mid] < target) {
         left = mid + 1;
       } else {
         right = mid - 1;
       }
     }
-    if (found) {
-      count++;
-      int j = i + 1;
-      while (j < len && arr[j] < target) j++;
-      while (j < len && arr[j] == target) j++;
+    if (first_occurrence == -1) continue;
+
+    // найти последнее вхождение target
+    left = first_occurrence;
+    right = len - 1;
+    while (left <= right) {
+      int mid = left + (right - left) / 2;
+      if (arr[mid] == target) {
+        last_occurrence = mid;
+        left = mid + 1;
+      } else if (arr[mid] < target) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
     }
+    int count_targets = last_occurrence - first_occurrence + 1;
+    count += count_targets;
   }
   return count;
 }
