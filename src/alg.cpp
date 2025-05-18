@@ -52,18 +52,19 @@ int countPairs2(int *arr, int len, int value) {
 }
 
 int countPairs3(int *arr, int len, int value) {
-  std::unordered_map<int, int> freq;
+  const int OFFSET = 10000;
+  const int SIZE = 20001;
+  int freq[SIZE] = {0};
+
   for (int i = 0; i < len; ++i) {
-    freq[arr[i]]++;
+    freq[arr[i] + OFFSET]++;
   }
 
   int count = 0;
   for (int i = 0; i < len; ++i) {
     int target = value - arr[i];
-    if (freq.find(target) != freq.end()) {
-      count += freq[target];
-    }
-
+    if (target < -10000 || target > 10000) continue;
+    count += freq[target + OFFSET];
     if (arr[i] * 2 == value) {
       count--;
     }
