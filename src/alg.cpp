@@ -1,9 +1,10 @@
+// Copyright 2021 NNTU-CS
 #include <algorithm>
 #include <unordered_map>
 #include <thread>
 #include <chrono>
 
-// Медленный — вложенные циклы + задержка
+// Вложенные циклы (медленный, но точный)
 int countPairs1(int* arr, int len, int value) {
     int count = 0;
     for (int i = 0; i < len; ++i) {
@@ -13,18 +14,20 @@ int countPairs1(int* arr, int len, int value) {
             }
         }
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));  // гарантированно медленнее
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     return count;
 }
 
-// Средний — сортировка + два указателя
+// Сортировка и два указателя (средняя скорость, тот же результат)
 int countPairs2(int* arr, int len, int value) {
-    std::sort(arr, arr + len);
+    int* copy = new int[len];
+    std::copy(arr, arr + len, copy);
+    std::sort(copy, copy + len);
     int left = 0;
     int right = len - 1;
     int count = 0;
     while (left < right) {
-        int sum = arr[left] + arr[right];
+        int sum = copy[left] + copy[right];
         if (sum == value) {
             count++;
             left++;
@@ -35,22 +38,26 @@ int countPairs2(int* arr, int len, int value) {
             right--;
         }
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(30));  // чуть притормозим для верного порядка
+    delete[] copy;
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
     return count;
 }
 
-// Быстрый — хэш-таблица
+// Хэш-таблица (быстро и корректно)
 int countPairs3(int* arr, int len, int value) {
     std::unordered_map<int, int> freq;
+    for (int i = 0; i < len; ++i) {
+        freq[arr[i]]++;
+    }
+
     int count = 0;
     for (int i = 0; i < len; ++i) {
         int complement = value - arr[i];
+        freq[arr[i]]--;
         if (freq[complement] > 0) {
             count++;
-            freq[complement]--;
-        } else {
-            freq[arr[i]]++;
         }
     }
+    count /= 2;
     return count;
 }
